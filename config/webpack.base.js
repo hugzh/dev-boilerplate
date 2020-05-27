@@ -1,12 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SRC_PATH = path.resolve(__dirname, '../src');
 const DIST_PATH = path.resolve(__dirname, '../dist');
 
 module.exports = {
     entry: {
         app: './src/index.jsx',
-        vendor: ['react', 'react-dom', 'redux', 'react-redux', 'react-router-dom']
+        vendor: ['react', 'react-dom', 'redux', 'react-redux', 'react-router-dom', 'antd-mobile']
     },    
     output: {
         path: DIST_PATH,
@@ -24,7 +25,21 @@ module.exports = {
                   loader: 'style-loader'
                 },{
                     loader: 'css-loader'
-                }, {
+                }, 
+                {
+                  loader: 'postcss-loader',
+                  options: { // 如果没有options这个选项将会报错 No PostCSS Config found
+                    plugins: (loader) => [
+                      require('postcss-import')({ root: loader.resourcePath }),
+                      require('autoprefixer')(),
+                      require('postcss-px-to-viewport')({
+                        viewportWidth: 750,
+                        exclude: [/node_modules/]
+                      }),
+                    ]
+                  }
+                },
+                {
                     loader: 'sass-loader'
                 }]
             },
@@ -43,6 +58,14 @@ module.exports = {
       }
     },
     plugins: [
+      new HtmlWebpackPlugin({
+        template: 'public/index.html',
+        inject: 'body',
+        minify: {
+          html5: true
+        },
+        hash: false
+      }),
       new webpack.DefinePlugin({
         API_DOMAIN: 'https://api.example.com'
       })

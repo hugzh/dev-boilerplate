@@ -11,7 +11,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = merge(baseWebpackConfig, {
     mode: 'production',
     output: {
-      filename: 'js/[name].[chunkhash:16].js',
+      filename: 'js/[name].[chunkhash:8].js',
     },
     module: {
       rules: [
@@ -26,6 +26,7 @@ module.exports = merge(baseWebpackConfig, {
                 plugins: (loader) => [
                   require('postcss-import')({ root: loader.resourcePath }),
                   require('autoprefixer')(),
+                  require('postcss-px-to-viewport')({ viewportWidth: 750 }),
                   require('cssnano')() // 压缩css
                 ]
               }
@@ -38,20 +39,12 @@ module.exports = merge(baseWebpackConfig, {
     plugins: [
       new CleanWebpackPlugin(),
       new MiniCssExtractPlugin({
-        filename:'css/[name].[hash].css',
-        chunkFilename:'css/[id].[hash].css'
-      }),
-      new HtmlWebpackPlugin({
-        template: 'public/index.html',
-        inject: 'body',
-        minify: {
-          html5: true
-        },
-        hash: false
+        filename:'css/[name].[hash:8].css',
+        chunkFilename:'css/[id].[hash:8].css'
       }),
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 5,
-        minChunkSize: 1000
+        minChunkSize: 30000
       }),
     ],
     optimization: {
